@@ -1,6 +1,6 @@
 import "./profile.scss"
 
-function Profile() {
+const Profile = () => {
   return (
     <div className="profile">Profile</div>
   )

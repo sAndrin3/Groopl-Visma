@@ -1,5 +1,5 @@
 import "./posts.scss"
-import "../post/Post"
+import Post from "../post/Post";
 
 const Posts = () => {
   //dammy data
