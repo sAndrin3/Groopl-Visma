@@ -18,7 +18,7 @@ export const register = async (req, res) => {
         .query('SELECT * FROM users WHERE username = @username OR Name = @name OR Email = @email');
       const user = result.recordset[0];
       if (user) {
-        return res.status(409).json({ error: 'User already exists' });
+        return res.status(409).json({ error: 'User already exists!' });
       } else {
         await pool
           .request()
@@ -45,8 +45,8 @@ export const register = async (req, res) => {
     console.log(req.body);
     let pool = await sql.connect(config.sql);
     const userResult = await pool.request()
-        .input("userName", sql.VarChar, username)
-        .query("select * from users where userName = @userName");
+        .input("username", sql.VarChar, username)
+        .query("select * from users where username = @username");
     const user = userResult.recordset[0];
 
     if (!user) {
@@ -55,9 +55,9 @@ export const register = async (req, res) => {
         if (!bcrypt.compareSync(password, user.password)) {
             res.status(401).json({ error: 'Authentication failed. Wrong password' });
         } else {
-            let token = `JWT ${jwt.sign({ email: user.email, userName: user.userName, id: user.id }, `${process.env.JWT_SECRET}`)}`;
-            const { id, userName, email } = user;
-            return res.json({ id: id, userName: userName, email: email, token: token });
+            let token = `JWT ${jwt.sign({username: user.username, name:user.name, email: user.email, id: user.id }, `${process.env.JWT_SECRET}`)}`;
+            const { id,name,  username, email } = user;
+            return res.json({ id: id, name: name, username: username, email: email, token: token });
         }
     }
 }

@@ -8,8 +8,17 @@ import cors from 'cors';
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
+
+//middlewares
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", true)
+    next()
+});
+
 //setup cors
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173"
+}));
 
 app.use((req, res, next) => {
     if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
