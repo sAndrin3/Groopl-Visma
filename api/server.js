@@ -4,10 +4,28 @@ import config from './src/db/config.js';
 import routes from './src/routes/routes.js';
 import jsonwebtoken from 'jsonwebtoken';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import multer from 'multer';
 
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cookieParser());
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, '/Web/public/upload')
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + file.originalname)
+    }
+  })
+  
+  const upload = multer({ storage: storage });
+  app.post("/upload", upload.single("file"), (req, res)=>{
+    const file = req.file
+    res.status(200).json(file.filename)
+  })
 
 //middlewares
 app.use((req, res, next) => {
@@ -18,6 +36,7 @@ app.use((req, res, next) => {
 //setup cors
 app.use(cors({
     origin: "http://localhost:5173"
+
 }));
 
 app.use((req, res, next) => {

@@ -24,6 +24,7 @@ const config = {
             enableArithAbort: true
         }
     },
+    jwt_secret:JWT_SECRET
 
 };
 export default config;

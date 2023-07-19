@@ -39,29 +39,55 @@ export const register = async (req, res) => {
     }
   };
 
-  //login user
   export const login = async (req, res) => {
     const { username, password } = req.body;
-    console.log(req.body);
-    let pool = await sql.connect(config.sql);
-    const userResult = await pool.request()
+  
+    let pool;
+    try {
+      pool = await sql.connect(config.sql);
+      let result = await pool
+        .request()
         .input("username", sql.VarChar, username)
-        .query("select * from users where username = @username");
-    const user = userResult.recordset[0];
-
-    if (!user) {
-        res.status(401).json({ error: 'Authentication failed. User not found.' });
-    } else if (user) {
-        if (!bcrypt.compareSync(password, user.password)) {
-            res.status(401).json({ error: 'Authentication failed. Wrong password' });
+        .query("SELECT * FROM users WHERE username = @username");
+  
+      const user = result.recordset[0];
+      if (!user) {
+        return res.status(404).json({ error: "User does not exist" });
+      } else {
+        const validPassword = bcrypt.compareSync(password, user.password);
+        if (!validPassword) {
+          return res.status(400).json({ error: "Invalid username or password" });
         } else {
-            let token = `JWT ${jwt.sign({username: user.username, name:user.name, email: user.email, id: user.id }, `${process.env.JWT_SECRET}`)}`;
-            const { id,name,  username, email } = user;
-            return res.json({ id: id, name: name, username: username, email: email, token: token });
-        }
-    }
-}
+          const token = jwt.sign(
+            {
+              id: user.id,
+              username: user.username,
+              name: user.name,
+              email: user.email,
+            },
+            config.jwt_secret
+          );
+          const { password, ...userWithoutPassword } = user;
 
+          res
+            .cookie("accessToken", token, {
+              httpOnly: true,
+              sameSite: "none",
+              secure: true,
+            })
+            .status(200)
+            .json(userWithoutPassword);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Error occurred while logging in" });
+    } finally {
+      if (pool) {
+        await pool.close();
+      }
+    }
+  };
 // logout user
 export const logout = (req, res) => {
     // Clear the authentication token on the client-side
