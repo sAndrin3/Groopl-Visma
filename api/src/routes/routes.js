@@ -1,5 +1,5 @@
 import { register, login, logout } from '../controllers/userController.js';
-import {getPosts, addPost, getComments, addComment} from "../controllers/authController.js"
+import {getPosts, addPost, getComments, addComment, getLikes, addLike, deleteLike} from "../controllers/authController.js"
 
 const routes = (app) => {
     app.route('/auth/register')
@@ -18,6 +18,12 @@ const routes = (app) => {
     app.route('/comments/:id')
         .get(getComments)
         .post(addComment)
+
+    app.route('/likes')
+        .get(getLikes)
+        .post(addLike)
+        .delete(deleteLike)
+        
 }
 
 export default routes;
