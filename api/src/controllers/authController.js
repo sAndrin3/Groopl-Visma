@@ -88,3 +88,57 @@ export const addPost = async (req, res) => {
   }
 };
 
+//getComments
+export const getComments = async (req,res)=> {
+  const { postId } = req.query;
+  try {
+    const pool = await sql.connect(config.sql);
+    let result = await pool
+      .request()
+      .input("postId", sql.Int, postId)
+      .query(
+        `SELECT c.*, name, profilePic FROM comments AS c JOIN users AS u ON (u.id = c.userId) WHERE c.postId = @postId ORDER BY c.createdAt DESC`
+      );
+    return res.status(200).json(result.recordset);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Error retrieving" });
+  }
+};
+
+//add a comment
+
+
+export const addComment = async (req, res) => {
+  const { desc, createdAt, postId } = req.body;
+  console.log(desc, createdAt, postId);
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
+
+  try {
+    const userInfo = await new Promise((resolve, reject) => {
+      jwt.verify(token, "secret", (err, decoded) => {
+        if (err) reject(err);
+        resolve(decoded);
+      });
+    });
+
+    const userId = userInfo.id;
+
+    const pool = await sql.connect(config.sql);
+    await pool
+      .request()
+      .input("desc", sql.VarChar, desc)
+      .input("userId", sql.Int, userId)
+      .input("createdAt", sql.DateTime, createdAt)
+      .input("postId", sql.Int, postId)
+      .query(
+        "INSERT INTO comments ([desc], userId, createdAt, postId) VALUES (@desc, @userId, GETDATE(), @postId)"
+      );
+
+    res.status(200).json({ message: "Comment added successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error.message);
+  }
+};

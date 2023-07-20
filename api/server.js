@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 //setup cors
 app.use(cors({
     origin: "http://localhost:5173"
+    
 
 }));
 

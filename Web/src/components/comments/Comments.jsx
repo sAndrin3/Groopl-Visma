@@ -1,48 +1,75 @@
-import { useContext } from "react";
-import "./comments.scss"
-import {AuthContext} from "../../context/authContext"
-const Comments = ()=> {
-    const {currentUser} = useContext(AuthContext)
+import { useContext, useState, useEffect } from "react";
+import "./comments.scss";
+import { AuthContext } from "../../context/authContext";
+import { useQuery } from "react-query";
+import { makeRequest } from "../../../axios";
+import moment from "moment";
+import { useMutation, useQueryClient } from "react-query";
 
-    //dammy data
+const Comments = ({ postId }) => {
+  const [desc, setDesc] = useState("");
+  const { currentUser } = useContext(AuthContext);
 
-    const comments = [
-        {
-            id: 1,
-            name: "Collins",
-            userId: 1,
-            profilePic: "https://images.pexels.com/photos/5807580/pexels-photo-5807580.jpeg?auto=compress&cs=tinysrgb&w=400",
-            desc: "Best coffee place in town",
-            img: "https://images.pexels.com/photos/1819635/pexels-photo-1819635.jpeg?auto=compress&cs=tinysrgb&w=400"
-     },
-        {
-          id: 2,
-          name: "Bingo",
-          userId: 2,
-          profilePic: "https://images.pexels.com/photos/5117913/pexels-photo-5117913.jpeg?auto=compress&cs=tinysrgb&w=400",
-          desc: "Nature Quest Live it! Love it!",
-          img: "https://images.pexels.com/photos/2832034/pexels-photo-2832034.jpeg?auto=compress&cs=tinysrgb&w=400"
-        },
-    ];
+  const { isLoading, error, data } = useQuery(["comments"], () =>
+    makeRequest.get(`/comments?postId=${postId}`).then((res) => res.data)
+  );
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    (newComment) => {
+      return makeRequest.post("/comments", newComment);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["comments"]);
+      },
+    }
+  );
+
+  useEffect(() => {
+    setDesc("");
+  }, []);
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+    try {
+      mutation.mutate({ desc, postId, userId: currentUser.id });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="comments">
-        <div className="write">
+      <div className="write">
         <img src={currentUser.profilePic} alt="" />
-        <input type="text" placeholder="write a comment"/>
-        <button>Send</button>
-        </div>
-        {comments.map(comment=>(
-            <div className="comment">
-                <img src={comment.profilePic} alt="" />
-                <div className="info">
-                    <span>{comment.name}</span>
-                    <p>{comment.desc}</p>
-                </div>
-                <span className="date">1 hour ago</span>
+        <input
+          type="text"
+          placeholder="write a comment"
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        />
+        <button onClick={handleClick}>Send</button>
+      </div>
+      {isLoading ? (
+        "loading"
+      ) : Array.isArray(data) ? (
+        data.map((comment) => (
+          <div className="comment" key={comment.id}>
+            <img src={comment.profilePic} alt="" />
+            <div className="info">
+              <span>{comment.name}</span>
+              <p>{comment.desc}</p>
             </div>
+            <span className="date">{moment(comment.createdAt).fromNow()}</span>
+          </div>
         ))
-    }</div>
-  )
-}
+      ) : (
+        <p>No comments found</p>
+      )}
+    </div>
+  );
+};
 
-export default Comments
+export default Comments;
