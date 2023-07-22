@@ -40,6 +40,7 @@ const handleLike = () => {
   mutation.mutate(data && data.includes(currentUser.id))
 }
 
+
   return (
     <div className="post">
       <div className="container">

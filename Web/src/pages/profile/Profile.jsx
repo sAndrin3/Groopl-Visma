@@ -7,14 +7,53 @@ import PlaceIcon from '@mui/icons-material/Place';
 import LanguageIcon from '@mui/icons-material/Language';
 import EmailIcon from '@mui/icons-material/Email';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Posts from "../../components/posts/Posts"
+import Posts from "../../components/posts/Posts";
+import { useQuery, useQueryClient, useMutation } from 'react-query';
+import { makeRequest } from "../../../axios";
+import { useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
+import { Update } from "../../components/update/Update";
 
 const Profile = () => {
+
+  const {currentUser} = useContext(AuthContext);
+
+  const userId = parseInt(useLocation().pathname.split("/")[2])
+
+  const { isLoading, error, data } = useQuery(['user'], () =>
+  makeRequest.get(`/users/find=${userId}`).then((res) => res.data)
+);
+const { isLoading: rIsLoading,data: relationshipData } = useQuery(['relationship'], () =>
+makeRequest.get(`/relationships?followedUserId=${userId}`).then((res) => res.data)
+);
+
+const queryClient = useQueryClient();
+
+const mutation = useMutation(
+  (following) => {
+    if(following) return makeRequest.delete(`/relationships?postId=${post.id}`);
+    return makeRequest.post("/relationship", {userId});
+  },
+  {
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["user"]);
+    },
+  }
+);
+
+const handleFollow = () => {
+  mutation.mutate(data && data.includes(currentUser.id))
+}
+
+
   return (
     <div className="profile">
-      <div className="images">
-        <img src="https://images.pexels.com/photos/17388779/pexels-photo-17388779/free-photo-of-city-nature-building-office.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load" alt="" className="cover" />
-        <img src="https://images.pexels.com/photos/16552809/pexels-photo-16552809/free-photo-of-colorful-lines-of-lights-in-darkness.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load" alt="" className="profilePic" />
+      {isLoading ? ("loading") : (<>
+        <div className="images">
+        <img src={data?.coverPic} alt="" className="cover" />
+        <img src= {data?.profilePic} alt="" className="profilePic" />
       </div>
       <div className="profileContainer">
         <div className="uInfo">
@@ -33,26 +72,29 @@ const Profile = () => {
             </a>
           </div>
           <div className="center">
-            <span>Collins</span>
+            <span>{data?.name}</span>
             <div className="info">
               <div className="item">
                 <PlaceIcon/>
-                <span>KE</span>
+                <span>{data?.city}</span>
               </div>
               <div className="item">
                 <LanguageIcon/>
-                <span>ENG</span>
+                <span>{data?.website}</span>
               </div>
               </div>
-              <button>follow</button>
+              {rIsLoading ? ("loading") : userId=== currentUser.id ? (<button>update</button>) :
+               (<button onclick={handleFollow}>{relationshipData.includes(currentUser.id) ? "Following" : "Follow"}</button>)}
           </div>
           <div className="right">
             <EmailIcon/>
             <MoreVertIcon/>
           </div>
         </div>
-        <Posts/>
+        <Posts userId={userId}/>
       </div>
+      </>)} 
+      <Update/>
     </div>
   )
 }

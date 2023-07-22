@@ -202,3 +202,100 @@ export const deleteLike = async (req, res) => {
     return res.status(500).json({ error: error });
   }
 };
+
+//get a user
+export const getUser = async (req,res)=>{
+  const userId = req.params.userId;
+
+  try {
+    const pool = await sql.connect(config.sql);
+    let result = await pool
+      .request()
+      .input("userId", sql.Int, userId)
+      .query("SELECT * FROM Users WHERE id = @userId");
+    const user = result.recordset[0];
+    if (!user) {
+      return res.status(400).json({ error: "User does not exist" });
+    } else {
+      const { password, ...userData } = user;
+      return res.status(200).json(userData);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error.message);
+  }
+};
+
+//get r/ships
+export const getRelationships = async (req, res) => {
+  const followedUserId = req.query.followedUserId;
+  // console.log(followedUserId);
+  let pool;
+  try {
+    pool = await sql.connect(config.sql);
+    let result = await pool
+      .request()
+      .input("followedUserId", sql.Int, followedUserId)
+      .query(
+        `SELECT followerUserId FROM relationships WHERE followedUserId = @followedUserId`
+      );
+    return res
+      .status(200)
+      .json(
+        result.recordset.map((relationship) => relationship.followerUserId)
+      );
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Error retrieving" });
+  } finally {
+    if (pool) {
+      await pool.close();
+    }
+  }
+}; 
+
+//add r/ship
+export const addRelationship = async (req, res) => {
+  const { followerUserId, followedUserId } = req.body;
+
+  let pool;
+  try {
+    pool = await sql.connect(config.sql);
+    await pool
+      .request()
+      .input("followerUserId", sql.Int, followerUserId)
+      .input("followedUserId", sql.Int, followedUserId)
+      .query(
+        "INSERT INTO relationships (followerUserId, followedUserId) VALUES (@followerUserId, @followedUserId)"
+      );
+
+    res.status(200).json({ message: "Relationship added successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.message });
+  } finally {
+    if (pool) {
+      await pool.close();
+    }
+  }
+};
+
+//delete r/ship
+export const deleteRelationship = async (req, res) => {
+  const { followerUserId, followedUserId } = req.body;
+  try {
+    const pool = await sql.connect(config.sql);
+    const result = await pool
+      .request()
+      .input("followerUserId", sql.Int, followerUserId)
+      .input("followedUserId", sql.Int, followedUserId)
+      .query(
+        "DELETE FROM relationships WHERE followerUserId = @followerUserId AND followedUserId = @followedUserId"
+      );
+
+    res.status(200).json({ message: "Unfollowed successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.message });
+  }
+};
