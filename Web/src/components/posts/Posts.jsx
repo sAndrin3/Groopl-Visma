@@ -5,7 +5,7 @@ import { makeRequest } from "../../../axios";
 
 const Posts = ({userId}) => {
   const { isLoading, error, data } = useQuery(['posts'], () =>
-    makeRequest.get(`/posts?userId=${userId}`).then((res) => res.data)
+    makeRequest.get(`/posts`).then((res) => res.data)
   );
 
   if (isLoading) {
@@ -15,10 +15,11 @@ const Posts = ({userId}) => {
   if (error) {
     return <div>Error: {error.message}</div>;
   }
-
+console.log(data);
   return (
     <div className="posts">
       {data.map(post => (
+
         <Post post={post} key={post.id} />
       ))}
     </div>

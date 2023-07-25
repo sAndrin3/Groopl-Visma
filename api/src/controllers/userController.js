@@ -3,6 +3,32 @@ import config from '../db/config.js';
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 
+export const loginRequired = (req, res, next) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized user' });
+  }
+
+  jwt.verify(token, config.jwt_secret, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    // Check if it's a valid user or admin
+    if (decoded.user) {
+      req.user = decoded.user;
+    } else if (decoded.admin) {
+      req.admin = decoded.admin;
+    } else {
+      return res.status(401).json({ message: 'Unauthorized user' });
+    }
+
+    next();
+  });
+};
+
+
 //Registering a new user
 export const register = async (req, res) => {
     const { username, name, email, password} = req.body;

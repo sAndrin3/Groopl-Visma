@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./comments.scss";
 import { AuthContext } from "../../context/authContext";
 import { useQuery } from "react-query";
@@ -10,19 +10,20 @@ const Comments = ({ postId }) => {
   const [desc, setDesc] = useState("");
   const { currentUser } = useContext(AuthContext);
 
-  const { isLoading, error, data } = useQuery(["comments"], () =>
-    makeRequest.get(`/comments?postId=${postId}`).then((res) => res.data)
+  const { isLoading, error, data: comments } = useQuery(["comments", postId], () =>
+    makeRequest.get(`/comments/${postId}`).then((res) => res.data)
   );
+
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
     (newComment) => {
-      return makeRequest.post("/comments", newComment);
+      return makeRequest.post(`/comments/${postId}`, newComment);
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments"]);
+        // Invalidate and refetch the comments query
+        queryClient.invalidateQueries(["comments", postId]);
       },
     }
   );
@@ -54,12 +55,12 @@ const Comments = ({ postId }) => {
       </div>
       {isLoading ? (
         "loading"
-      ) : Array.isArray(data) ? (
-        data.map((comment) => (
+      ) : comments && comments.length > 0 ? (
+        comments.map((comment) => (
           <div className="comment" key={comment.id}>
             <img src={comment.profilePic} alt="" />
             <div className="info">
-              <span>{comment.name}</span>
+              <span>{comment.name}</span> {/* Use comment name instead of authorName */}
               <p>{comment.desc}</p>
             </div>
             <span className="date">{moment(comment.createdAt).fromNow()}</span>

@@ -1,4 +1,4 @@
-import { register, login, logout } from '../controllers/userController.js';
+import { register, login, loginRequired, logout } from '../controllers/userController.js';
 import {getPosts, addPost, getComments, addComment, getLikes, addLike, deleteLike, getUser,
 getRelationships, addRelationship, deleteRelationship} from "../controllers/authController.js"
 
@@ -20,10 +20,10 @@ const routes = (app) => {
         .get(getComments)
         .post(addComment)
 
-    app.route('/likes')
-        .get(getLikes)
+    app.route('/likes/:postId')
+        .get(loginRequired,getLikes)
         .post(addLike)
-        .delete(deleteLike)
+        .delete(loginRequired,deleteLike)
 
     app.route('/users/find/:userId')
         .get(getUser)
