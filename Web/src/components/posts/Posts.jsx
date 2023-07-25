@@ -5,23 +5,24 @@ import { makeRequest } from "../../../axios";
 
 const Posts = ({userId}) => {
   const { isLoading, error, data } = useQuery(['posts'], () =>
-    makeRequest.get(`/posts`).then((res) => res.data),
+    makeRequest.get(`/posts?userId=`+userId).then((res) => res.data),
   );
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-console.log(data);
+  // if (error) {
+  //   return <div>Error: {error.message}</div>;
+  // }
+// console.log(data);
   return (
     <div className="posts">
-      {data.map(post => (
-
-        <Post post={post} key={post.id} />
-      ))}
+      {error
+      ? "something went wrong!"
+      : isLoading
+      ? "loading"
+      : data.map((post) => <Post post={post} key={post.id} />)}
     </div>
   );
 };

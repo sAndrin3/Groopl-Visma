@@ -1,6 +1,6 @@
 import { register, login, loginRequired, logout } from '../controllers/userController.js';
 import {getPosts, addPost, getComments, addComment, getLikes, addLike, deleteLike, getUser,
-getRelationships, addRelationship, deleteRelationship} from "../controllers/authController.js"
+getRelationships, addRelationship, deleteRelationship, updateUser, deletePost} from "../controllers/authController.js"
 
 const routes = (app) => {
     app.route('/auth/register')
@@ -15,6 +15,8 @@ const routes = (app) => {
     app.route('/posts')
         .get(getPosts)
         .post(addPost)
+    
+    app.delete('/posts/:id', deletePost);
 
     app.route('/comments/:id')
         .get(getComments)
@@ -32,6 +34,9 @@ const routes = (app) => {
         .get(getRelationships)
         .post(addRelationship)
         .delete(deleteRelationship)
+
+    app.route('/users/:userId')
+        .put(updateUser)
 }
 
 export default routes;

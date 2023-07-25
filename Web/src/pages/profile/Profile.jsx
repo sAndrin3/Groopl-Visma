@@ -11,12 +11,12 @@ import Posts from "../../components/posts/Posts";
 import { useQuery, useQueryClient, useMutation } from 'react-query';
 import { makeRequest } from "../../../axios";
 import { useLocation } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import { Update } from "../../components/update/Update";
 
 const Profile = () => {
-
+  const [openUpdate, setOpenUpdate] =useState(false)
   const {currentUser} = useContext(AuthContext);
 
   const userId = parseInt(useLocation().pathname.split("/")[2])
@@ -32,13 +32,13 @@ const queryClient = useQueryClient();
 
 const mutation = useMutation(
   (following) => {
-    if(following) return makeRequest.delete(`/relationships?postId=${post.id}`);
+    if(following) return makeRequest.delete(`/relationships?userId=${userId}`);
     return makeRequest.post("/relationship", {userId});
   },
   {
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries(["user"]);
+      queryClient.invalidateQueries(["relationship"]);
     },
   }
 );
@@ -83,7 +83,8 @@ const handleFollow = () => {
                 <span>{data?.website}</span>
               </div>
               </div>
-              {rIsLoading ? ("loading") : userId=== currentUser.id ? (<button>update</button>) :
+              {rIsLoading ? ("loading") : userId=== currentUser.id ? (
+              <button onClick={()=>setOpenUpdate(true)}>update</button>) :
                (<button onclick={handleFollow}>{relationshipData.includes(currentUser.id) ? "Following" : "Follow"}</button>)}
           </div>
           <div className="right">
@@ -94,7 +95,7 @@ const handleFollow = () => {
         <Posts userId={userId}/>
       </div>
       </>)} 
-      <Update/>
+      {openUpdate && <Update setopenUpdate={setOpenUpdate} user={data}/>}
     </div>
   )
 }

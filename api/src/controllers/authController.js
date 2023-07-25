@@ -102,6 +102,64 @@ export const getPosts = async (req, res) => {
     }
   });
 };
+
+// export const getPosts = async (req, res) => {
+//   const userId = req.query.userId;
+//   const userInfo = req.userInfo;
+
+//   try {
+//     const pool = await sql.connect(config.sql);
+//     const request = pool.request();
+
+//     let result;
+//     if (userId !== "undefined") {
+//       result = await request
+//         .input("userId", sql.Int, userId)
+//         .query(
+//           `SELECT p.*, u.id AS authorId, u.username AS authorUsername, u.name AS authorName, u.profilePic AS authorProfilePic,
+//           (SELECT COUNT(*) FROM likes l WHERE l.postId = p.id) AS likesCount,
+//           (SELECT COUNT(*) FROM comments c WHERE c.postId = p.id) AS commentsCount,
+//           (
+//             SELECT c.id, c.[desc], c.createdAt, c.userId, cu.name, cu.profilePic
+//             FROM comments c
+//             INNER JOIN users cu ON c.userId = cu.id
+//             WHERE c.postId = p.id
+//             FOR JSON PATH
+//           ) AS comments
+//           FROM posts p
+//           INNER JOIN users u ON p.userId = u.id
+//           WHERE p.userId = @userId
+//           ORDER BY p.createdAt DESC`
+//         );
+//     } else {
+//       result = await request
+//         .input("followerUserId", sql.Int, userInfo.id)
+//         .query(
+//           `SELECT p.*, u.id AS authorId, u.username AS authorUsername, u.name AS authorName, u.profilePic AS authorProfilePic,
+//           (SELECT COUNT(*) FROM likes l WHERE l.postId = p.id) AS likesCount,
+//           (SELECT COUNT(*) FROM comments c WHERE c.postId = p.id) AS commentsCount,
+//           (
+//             SELECT c.id, c.[desc], c.createdAt, c.userId, cu.name, cu.profilePic
+//             FROM comments c
+//             INNER JOIN users cu ON c.userId = cu.id
+//             WHERE c.postId = p.id
+//             FOR JSON PATH
+//           ) AS comments
+//           FROM posts p
+//           INNER JOIN users u ON p.userId = u.id
+//           LEFT JOIN relationships r ON (p.userId = r.followedUserId)
+//           WHERE r.followerUserId = @followerUserId OR p.userId = @followerUserId
+//           ORDER BY p.createdAt DESC`
+//         );
+//     }
+
+//     return res.status(200).json(result.recordset);
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json(error);
+//   }
+// };
+
 //Adding a post
 
 export const addPost = async (req, res) => {
@@ -124,6 +182,29 @@ export const addPost = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "An error occurred while adding the post" });
+  }
+};
+
+// Deleting a post
+export const deletePost = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const pool = await sql.connect(config.sql);
+    let result = await pool
+      .request()
+      .input("id", sql.Int, id)
+      .query("DELETE FROM posts WHERE id = @id");
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ error: "An error occured while deleting post!!" });
   }
 };
 
@@ -262,6 +343,40 @@ export const getUser = async (req,res)=>{
   } catch (error) {
     console.log(error);
     return res.status(500).json(error.message);
+  }
+};
+
+// updateUser
+export const updateUser = async (req, res) => {
+  const { username, email, name, country, coverPic, profilePic } =
+    req.body;
+  const userInfo = req.userInfo;
+
+  try {
+    const pool = await sql.connect(config.sql);
+    const result = await pool
+      .request()
+      .input("username", sql.VarChar, username)
+      .input("email", sql.VarChar, email)
+      .input("name", sql.VarChar, name)
+      .input("country", sql.VarChar, country)
+      .input("coverPic", sql.VarChar, coverPic)
+      .input("profilePic", sql.VarChar, profilePic)
+      .input("userId", sql.Int, userInfo.id)
+      .query(
+        "UPDATE users SET username = @username, email = @email, name = @name, country = @country, coverPic = @coverPic, profilePic = @profilePic WHERE id = @userId"
+      );
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(403).json("You can update only your profile");
+    }
+
+    return res.json("Updated!");
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ error: "Error occurred while updating user" });
   }
 };
 
