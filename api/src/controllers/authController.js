@@ -94,7 +94,7 @@ export const getPosts = async (req, res) => {
       // const combinedPosts = [...result.recordset, ...userPosts.recordset];
 
       return res.status(200).json(request.recordset);
-      await pool.close();
+      // await pool.close();
 
     } catch (error) {
       console.log(error);
@@ -119,8 +119,7 @@ export const addPost = async (req, res) => {
         "INSERT INTO posts ([desc], userId, createdAt, img) VALUES (@desc, @userId, GETDATE(), @img)"
       );
 
-    await pool.close();
-
+    // await pool.close();
     res.status(200).json({ message: "Post added successfully" });
   } catch (error) {
     console.log(error);
@@ -287,11 +286,7 @@ export const getRelationships = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Error retrieving" });
-  } finally {
-    if (pool) {
-      await pool.close();
-    }
-  }
+  } 
 }; 
 
 //add r/ship
@@ -313,11 +308,7 @@ export const addRelationship = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
-  } finally {
-    if (pool) {
-      await pool.close();
-    }
-  }
+  } 
 };
 
 //delete r/ship

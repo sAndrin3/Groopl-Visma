@@ -85,7 +85,7 @@ const Post = ({ post }) => {
     mutation.mutate(!isLiked);
   };
 
-
+// console.log(post);
   return (
     <div className="post">
       <div className="container">
@@ -103,7 +103,7 @@ const Post = ({ post }) => {
         </div>
         <div className="content">
           <p>{post.desc}</p>
-          <img src={"./upload/" + post.img} alt="" />
+          <img src={post.img} alt="" />
         </div>
         <div className="info">
           <div className="item">
