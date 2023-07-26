@@ -75,9 +75,6 @@ const io = new Server(server, {
     },
 });
 
-// app.get('/', (req, res) => {
-//     res.send('Server is running on port 5000');
-// });
 
 io.on("connection", (socket) => {                   // Listen to new connection
     console.log(`User Connected: ${socket.id}`);
@@ -87,8 +84,8 @@ io.on("connection", (socket) => {                   // Listen to new connection
         console.log(`User with ID: ${socket.id} joined room: ${data}`);  // Print message in console
     });
 
-    socket.on("send_message", (data) => {                     // Listen to send_message event
-        socket.to(data.room).emit("receive_message", data);  // Send message to the room
+    socket.on("send_message", (data)  => {
+      socket.to(data.room).emit("receive_message", data);
     });
 
     socket.on("disconnect", () => {                          // Listen to disconnect event

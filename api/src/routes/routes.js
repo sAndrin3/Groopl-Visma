@@ -39,8 +39,8 @@ const routes = (app) => {
         .put(updateUser)
 
     app.route('/messages')
-        .get(loginRequired, getMessages) 
-        .post(loginRequired, addMessage);
+        .get(getMessages) 
+        .post(addMessage);
 }
 
 export default routes;
