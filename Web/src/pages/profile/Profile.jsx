@@ -14,6 +14,7 @@ import { useLocation } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import { Update } from "../../components/update/Update";
+import Loaders from "../../components/loaders";
 
 const Profile = () => {
   const [openUpdate, setOpenUpdate] =useState(false)
@@ -50,7 +51,7 @@ const handleFollow = () => {
 
   return (
     <div className="profile">
-      {isLoading ? ("loading") : (<>
+      {isLoading ? <Loaders/> : (<>
         <div className="images">
         <img src={data?.coverPic} alt="" className="cover" />
         <img src= {data?.profilePic} alt="" className="profilePic" />
@@ -83,7 +84,7 @@ const handleFollow = () => {
                 <span>{data?.website}</span>
               </div>
               </div>
-              {rIsLoading ? ("loading") : userId=== currentUser.id ? (
+              {rIsLoading ? <Loaders/> : userId=== currentUser.id ? (
               <button onClick={()=>setOpenUpdate(true)}>update</button>) :
                (<button onclick={handleFollow}>{relationshipData.includes(currentUser.id) ? "Following" : "Follow"}</button>)}
           </div>

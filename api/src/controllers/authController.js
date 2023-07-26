@@ -348,9 +348,9 @@ export const getUser = async (req,res)=>{
 
 // updateUser
 export const updateUser = async (req, res) => {
-  const { username, email, name, country, coverPic, profilePic } =
+  const { username, email, name, city, coverPic, profilePic } =
     req.body;
-  const userInfo = req.userInfo;
+  const userInfo = req.body;
 
   try {
     const pool = await sql.connect(config.sql);
@@ -359,12 +359,12 @@ export const updateUser = async (req, res) => {
       .input("username", sql.VarChar, username)
       .input("email", sql.VarChar, email)
       .input("name", sql.VarChar, name)
-      .input("country", sql.VarChar, country)
+      .input("city", sql.VarChar, city)
       .input("coverPic", sql.VarChar, coverPic)
       .input("profilePic", sql.VarChar, profilePic)
       .input("userId", sql.Int, userInfo.id)
       .query(
-        "UPDATE users SET username = @username, email = @email, name = @name, country = @country, coverPic = @coverPic, profilePic = @profilePic WHERE id = @userId"
+        "UPDATE users SET username = @username, email = @email, name = @name, city = @city, coverPic = @coverPic, profilePic = @profilePic WHERE id = @userId"
       );
 
     if (result.rowsAffected[0] === 0) {
@@ -443,5 +443,58 @@ export const deleteRelationship = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
+  }
+};
+
+export const addMessage = async (req, res) => {
+  const { content, senderUserId, receiverUserId, replyToMessageId } = req.body;
+
+  try {
+    const pool = await sql.connect(config.sql);
+
+    // Check if required fields are provided
+    if (!content || !senderUserId || !receiverUserId) {
+      return res.status(400).json({ error: 'Content, senderUserId, and receiverUserId are required.' });
+    }
+
+    // Insert the new message into the 'messages' table
+    const result = await pool
+      .request()
+      .input('content', sql.VarChar, content)
+      .input('senderUserId', sql.Int, senderUserId)
+      .input('receiverUserId', sql.Int, receiverUserId)
+      .input('replyToMessageId', sql.Int, replyToMessageId)
+      .query(`
+        INSERT INTO messages (content, senderUserId, receiverUserId, replyToMessageId, createdAt)
+        VALUES (@content, @senderUserId, @receiverUserId, @replyToMessageId, GETDATE());
+      `);
+
+    // If the message is successfully added, return a success response
+    if (result.rowsAffected[0] > 0) {
+      return res.status(201).json({ message: 'Message added successfully.' });
+    } else {
+      return res.status(500).json({ error: 'Failed to add the message.' });
+    }
+  } catch (error) {
+    console.error('Error adding message:', error);
+    return res.status(500).json(error.message);
+  }
+};
+
+// GET /api/messages - Get all messages
+export const getMessages = async (req, res) => {
+  try {
+    const pool = await sql.connect(config.sql);
+
+    // Fetch all messages from the 'messages' table
+    const result = await pool
+      .request()
+      .query('SELECT * FROM messages;');
+
+    // If messages are found, return them as a response
+    return res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error('Error getting messages:', error);
+    return res.status(500).json({ error: 'An error occurred while getting messages.' });
   }
 };

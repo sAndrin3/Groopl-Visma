@@ -13,7 +13,8 @@ import videos from "../../assets/videos.png"
 import watch from "../../assets/watch.png"
 import messages from "../../assets/messages.png"
 import { useContext } from "react"
-import { AuthContext } from "../../context/authContext"
+import { AuthContext } from "../../context/authContext";
+import {Link} from  'react-router-dom';
 
 const Leftbar = () =>  {
   const {currentUser} = useContext(AuthContext);
@@ -71,7 +72,7 @@ const Leftbar = () =>  {
           </div>
           <div className="item">
             <img src={messages} alt="" />
-            <span>Messages</span>
+            <Link to="/messages" style={{textDecoration:"none"}}>Messages</Link>
           </div>
         </div>
       </div>

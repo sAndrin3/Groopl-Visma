@@ -13,6 +13,7 @@ import Leftbar from './components/leftbar/Leftbar';
 import Rightbar from './components/rightbar/Rightbar';
 import Home from './pages/home/Home';
 import Profile from './pages/profile/Profile';
+import Messages from './pages/home/messages'
 import "./style.scss";
 import { DarkModeContext } from './context/darkModeContext';
 import { useContext } from 'react';
@@ -80,6 +81,10 @@ function App() {
     {
       path: "/register",
       element: <Register />
+    },
+    {
+      path: "/messages",
+      element: <Messages />
     },
   ]);
 

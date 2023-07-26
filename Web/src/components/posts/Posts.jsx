@@ -2,6 +2,7 @@ import "./posts.scss";
 import Post from "../post/Post";
 import { useQuery } from 'react-query';
 import { makeRequest } from "../../../axios";
+import Loaders from "../loaders";
 
 const Posts = ({userId}) => {
   const { isLoading, error, data } = useQuery(['posts'], () =>
@@ -21,7 +22,7 @@ const Posts = ({userId}) => {
       {error
       ? "something went wrong!"
       : isLoading
-      ? "loading"
+      ? <Loaders/>
       : data.map((post) => <Post post={post} key={post.id} />)}
     </div>
   );
