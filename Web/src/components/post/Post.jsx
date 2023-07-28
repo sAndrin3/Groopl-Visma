@@ -144,7 +144,7 @@ const Post = ({ post }) => {
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
             <TextsmsOutlinedIcon />
-            10 Comments
+            1 Comment
           </div>
           <div className="item">
             <ShareOutlinedIcon />
