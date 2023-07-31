@@ -72,7 +72,7 @@ const Leftbar = () =>  {
           </div>
           <div className="item">
             <img src={messages} alt="" />
-            <Link to="/messages" style={{textDecoration:"none"}}>Messages</Link>
+            <Link to="/messages" style={{textDecoration:"none", color:"black"}}>Messages</Link>
           </div>
         </div>
       </div>
