@@ -25,6 +25,7 @@ Welcome to our Social Media Platform! This documentation will guide you through 
 ## Introduction
 
 Our Social Media Platform is designed to connect users from around the world, allowing them to share their thoughts, ideas, and experiences with others. Whether it's posting your own content, engaging with others' posts through comments and likes, or sharing interesting content with your friends, our platform offers a user-friendly and intuitive experience.
+https://github.com/sAndrin3/Groopl-Visma/blob/master/images/Screenshot%20from%202023-07-31%2009-56-06.png?raw=true
 
 ## Getting Started
 
