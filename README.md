@@ -98,6 +98,9 @@ If you encounter any issues, have questions, or need assistance, you can reach o
 
 This project is licensed under the [MIT License](LICENSE.md). Feel free to use, modify, and distribute the code as per the terms of the license.
 
+##Contact
+For any inquiries or feedback, feel free to reach out to us at sandrinemalanga2001@gmail.com or visit our GitHub profile: github.com/sAndrin3.
+
 ---
 
 Thank you for choosing our Social Media Platform! We hope you enjoy connecting with others and sharing your experiences in a positive and engaging community. If you have any feedback or suggestions, we'd love to hear from you!
