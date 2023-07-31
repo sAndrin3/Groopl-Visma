@@ -1,5 +1,6 @@
 # Groopl-Visma
 Social Media Platform
+ <img src="https://raw.githubusercontent.com/sAndrin3/Groopl-Visma/a6c87468d37032969dbd63bf73776172a95caccf/images/groopl.svg" height="250" align="center" >
 # Social Media Platform Documentation
 
 Welcome to our Social Media Platform! This documentation will guide you through the features and functionalities of our platform, allowing you to post, comment, like, and share content while also creating your own posts. We hope you have a fantastic social experience!
@@ -25,7 +26,7 @@ Welcome to our Social Media Platform! This documentation will guide you through 
 ## Introduction
 
 Our Social Media Platform is designed to connect users from around the world, allowing them to share their thoughts, ideas, and experiences with others. Whether it's posting your own content, engaging with others' posts through comments and likes, or sharing interesting content with your friends, our platform offers a user-friendly and intuitive experience.
-https://github.com/sAndrin3/Groopl-Visma/blob/master/images/Screenshot%20from%202023-07-31%2009-56-06.png?raw=true
+
 
 ## Getting Started
 
