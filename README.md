@@ -81,6 +81,9 @@ Here's how you can use the various features of our Social Media Platform:
 3. A pop-up window will appear, allowing you to add a comment or message to accompany the shared post.
 4. Click the "Share" button to share the post on your profile.
 
+
+#Screenshots
+![screenshot1]([https://github.com/collins1968/Task-Manager/blob/master/Images/Screenshot1.png?raw=true](https://github.com/sAndrin3/Groopl-Visma/blob/master/images/Screenshot%20from%202023-07-31%2009-56-06.png?raw=true))
 ## Contributing
 
 We welcome contributions from the community to improve our platform. If you have suggestions for new features, bug fixes, or any other improvements, please feel free to submit a pull request on our GitHub repository.
